@@ -1,1 +1,0 @@
-print("tester.py __name__ =", __name__) #can specify code to be executed if the script in question is executed (as the main program)
