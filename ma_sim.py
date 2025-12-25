@@ -69,29 +69,38 @@ def process_results(results):
     print(final_df.info())
     print(final_df.head())
 
+'''''' 
+def get_test_pairs(pair_str):
+    #existing_pairs = instrument.Instrument.get_instruments_dict.keys()
+    existing_pairs = "BTC_USD, ETH_USD" #dummy
+    pairs = pair_str.split(",")
+    
+    test_list = []
+    for p1 in pairs:
+        for p2 in pairs:
+            p = f'{p1}_{p2}'
+            if p in existing_pairs:
+                test_list.append(p)
 
-
+    print(test_list)
+    return test_list
 
 
 def run():
-    #currencies = 'BTC,USD' #add more!
+    currencies = 'BTC,USD,ETH' #add more!
     pairname = "BTC_USD"
     granularity = "1m"
     ma_short = [8, 10, 12]
     ma_long = [21, 34, 55]
-    #i_pair = instrument.Instrument(pairname)
+    test_pairs = get_test_pairs(currencies)
+
+    #i_pair = instrument.Instrument.get_instruments_dict()[pairname]
 
     price_data = get_price_data(pairname, granularity)
     price_data = processs_data(ma_short, ma_long, price_data)
     
     results = []
-
-    #best_gain = None
-    #best = -100000.0    #arbitrary large negative number, best_gain
-    # b_mashort = 0           #best ma_short
-    #b_malong = 0        #best ma_long
-
-
+    
     #iterate through all combinations of ma_short and ma_long to find the best performing pair.
     for _malong in ma_long:
         for _mashort in ma_short:
@@ -103,4 +112,5 @@ def run():
     process_results(results)
 
 if __name__ == "__main__":
-    run()
+    #run()
+    get_test_pairs('BTC,USD,EUR,CHF,ETH')
