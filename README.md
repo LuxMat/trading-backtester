@@ -5,6 +5,9 @@ and hopefuly learn something on the way.
 
 I want to host this server on an raspberry pi, and eventully cluster, and after that AI cluster.
 
+Using bayesian interference for exit and % stop loss strategy. 
+Then using strategy for "price prediction"
+
 Stage 1: 
 
 Building the interactive platform. My first try will be with streamlit library.
@@ -43,11 +46,10 @@ Libraries:
 
 
     * Pandas
-
+        Data storage & dataframes.
 
     * Matplotlib
 
 
-    * Plotly?
-
-
+    * Plotly
+        Easy lib to build interactive plot. 

@@ -51,3 +51,22 @@ Simulera hur en egen order skulle flytta priset.
 
 
 "Liten limit order book simulator"
+
+#lib 
+"quant connect" - "tyngre"
+"backgtrader" - "tyngre" 
+"backtesting.py" - "lättare"
+
+
+koppla flera symbols för att optimera
+
+craches: 
+2008 financial
+2020 covid
+flash crashes
+
+commission x2?
+planned close order - execution delay - påverkan? random?
+slippage - increase/dedrease påverkan? 3x?
+
+MC simulator.
