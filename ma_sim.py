@@ -1,6 +1,7 @@
 import pandas as pd
 import utils
 import instrument
+import ma_result
 pd.set_option('display.max_columns', None) #show all columns when printing dataframe
 
 
@@ -32,7 +33,12 @@ def evaluate_pair(i_pair, ma_short, ma_long, price_data):
     #print(f'{i_pair.pairname} MA Short: {ma_short}, MA Long: {ma_long}, Trades:{df_trades.shape[0]}, Total Gains: {df_trades["Gains"].sum():.0f}')
     print(f'USD_BCT, MA Short: {ma_short}, MA Long: {ma_long}, Trades:{df_trades.shape[0]}, Total Gains: {df_trades["GAINS"].sum():.0f}')
 
-    return df_trades['GAINS'].sum()
+    return ma_result.MAResult(
+        df_trades=df_trades,
+        #pairname=i_pair.name
+        pairname='BTC_USD',
+        params={'mashort' : ma_short, 'malong' : ma_long}
+    )
 
 
 
@@ -56,8 +62,19 @@ def processs_data(ma_short, ma_long, price_data):
     return price_data
 
 
+def process_results(results):
+    results_list = [r.result_ob() for r in results]
+    final_df = pd.DataFrame.from_dict(results_list)
+
+    print(final_df.info())
+    print(final_df.head())
+
+
+
+
 
 def run():
+    #currencies = 'BTC,USD' #add more!
     pairname = "BTC_USD"
     granularity = "1m"
     ma_short = [8, 10, 12]
@@ -66,12 +83,13 @@ def run():
 
     price_data = get_price_data(pairname, granularity)
     price_data = processs_data(ma_short, ma_long, price_data)
-    print(price_data.tail())
+    
+    results = []
 
     #best_gain = None
-    best = -100000.0    #arbitrary large negative number, best_gain
-    b_mashort = 0           #best ma_short
-    b_malong = 0        #best ma_long
+    #best = -100000.0    #arbitrary large negative number, best_gain
+    # b_mashort = 0           #best ma_short
+    #b_malong = 0        #best ma_long
 
 
     #iterate through all combinations of ma_short and ma_long to find the best performing pair.
@@ -79,16 +97,10 @@ def run():
         for _mashort in ma_short:
             if _mashort >= _malong:
                 continue
-            i_pair_holder = None  #dummy for now
-            res = evaluate_pair(i_pair_holder, _mashort, _malong, price_data.copy()) #result
- 
-            if res > best:
-                best = res
-                b_mashort = _mashort
-                b_malong = _malong
+            i_pair_holder = None                #dummy for now
+            results.append(evaluate_pair(i_pair_holder, _mashort, _malong, price_data.copy())) #result 
 
-    print(f'Best MA Short: {b_mashort}, Best MA Long: {b_malong}, Best Gains: {best:.0f}')
-
+    process_results(results)
 
 if __name__ == "__main__":
     run()
