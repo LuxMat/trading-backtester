@@ -1,1 +1,3 @@
-BTC_USD
+name,type,displayName,pipLocation,marginRate
+BTC_USD,None,None,None,None
+ETH_USD,None,None,None,None

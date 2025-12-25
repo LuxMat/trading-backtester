@@ -34,7 +34,7 @@ class Instrument:
 
     }
 
-    our_instrument = instruments_dict["EUR_USD"]
+    our_instrument = instruments_dict["BTC_USD"]
     '''
 
     @classmethod
