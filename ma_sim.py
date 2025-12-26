@@ -1,7 +1,10 @@
 import pandas as pd
+from dateutil.parser import *
+
 import utils
 import instrument
 import ma_result
+
 pd.set_option('display.max_columns', None) #show all columns when printing dataframe
 
 
@@ -20,6 +23,8 @@ def get_ma_col(ma):
 
 def evaluate_pair(i_pair, ma_short, ma_long, price_data):
 
+    price_data = price_data[['open_time', 'close', get_ma_col(ma_short), get_ma_col(ma_long)]].copy()
+
     price_data['DIFF'] = price_data[get_ma_col(ma_short)] - price_data[get_ma_col(ma_long)]
     price_data['DIFF_PREV'] = price_data['DIFF'].shift(1)
     price_data['IS_TRADE'] = price_data.apply(is_trade, axis=1)
@@ -28,8 +33,19 @@ def evaluate_pair(i_pair, ma_short, ma_long, price_data):
     #df_trades['DELTA'] = (df_trades.close.diff()/i_pair.pipLocation).shift(-1)  #calculate difference between trade prices, shifted by 1 to avoid lookahead bias
     df_trades['DELTA'] = df_trades.close.diff().shift(-1)
     df_trades['GAINS'] = df_trades["DELTA"] * df_trades["IS_TRADE"]  #calculate gains based on trade direction
+    
+    df_trades['PAIR'] = i_pair.name
+    df_trades['MASHORT'] = ma_short
+    df_trades['MALONG'] = ma_long
 
+    del df_trades[get_ma_col(ma_short)]
+    del df_trades[get_ma_col(ma_long)]
 
+    #df_trades['open_time'] = [parse(x) for x in df_trades['open_time']]
+    df_trades['DURATION'] = df_trades['open_time'].diff().shift(-1)
+    df_trades['DURATION'] = [x.total_seconds() / 3600 for x in df_trades.DURATION]
+    df_trades.dropna(inplace=True)
+    
     #print(f'{i_pair.pairname} MA Short: {ma_short}, MA Long: {ma_long}, Trades:{df_trades.shape[0]}, Total Gains: {df_trades["Gains"].sum():.0f}')
     ##print(f'USD_BCT, MA Short: {ma_short}, MA Long: {ma_long}, Trades:{df_trades.shape[0]}, Total Gains: {df_trades["GAINS"].sum():.0f}')
 
@@ -61,6 +77,11 @@ def processs_data(ma_short, ma_long, price_data):
 
     return price_data
 
+def store_trades(results):
+    all_trade_df_list = [x.df_trades for x in results]
+    all_trade_df = pd.concat(all_trade_df_list)
+    all_trade_df.to_csv('all_trades.csv')
+
 
 def process_results(results):
     results_list = [r.result_ob() for r in results]
@@ -70,7 +91,6 @@ def process_results(results):
     print(final_df.shape, final_df.num_trades.sum())
     
 
-'''''' 
 def get_test_pairs(pair_str):
     existing_pairs = instrument.Instrument.get_instruments_dict().keys()
     pairs = pair_str.split(",")
@@ -109,6 +129,7 @@ def run():
                 results.append(evaluate_pair(i_pair, _mashort, _malong, price_data.copy())) #result 
 
     process_results(results)
+    store_trades(results)
 
 if __name__ == "__main__":
     run()
