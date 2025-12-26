@@ -82,6 +82,7 @@ def store_trades(results):
     all_trade_df_list = [x.df_trades for x in results]
     all_trade_df = pd.concat(all_trade_df_list)
     all_trade_df.to_csv('all_trades.csv')
+    return all_trade_df
 
 
 def process_results(results):
@@ -91,7 +92,8 @@ def process_results(results):
     final_df.to_csv('ma_test_res.csv')
     print(final_df.shape, final_df.num_trades.sum())
 
-    create_excel(final_df)
+    return final_df
+
     
 
 def get_test_pairs(pair_str):
@@ -131,8 +133,10 @@ def run():
                     continue
                 results.append(evaluate_pair(i_pair, _mashort, _malong, price_data.copy())) #result 
 
-    process_results(results)
-    store_trades(results)
+    final_df = process_results(results)
+    all_trades_df = store_trades(results)
+
+    create_excel(final_df, all_trades_df)
 
 if __name__ == "__main__":
     run()
